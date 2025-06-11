@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+<div>
+    <p><strong>First Name:</strong> {{ patient.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ patient.last_name }}</p>
+    <p><strong>Date of Birth:</strong> {{ patient.date_of_birth.strftime('%Y-%m-%d') if patient.date_of_birth else 'N/A' }}</p>
+    <p><strong>Contact Info:</strong> {{ patient.contact_info if patient.contact_info else 'N/A' }}</p>
+    <p><strong>Anamnesis:</strong> {{ patient.anamnesis if patient.anamnesis else 'N/A' }}</p>
+    <p><strong>Record Created:</strong> {{ patient.created_at.strftime('%Y-%m-%d %H:%M:%S') if patient.created_at else 'N/A' }}</p>
+    <p><strong>Last Updated:</strong> {{ patient.updated_at.strftime('%Y-%m-%d %H:%M:%S') if patient.updated_at else 'N/A' }}</p>
+</div>
+<p>
+    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Patient</a> |
+    <a href="{{ url_for('list_patients') }}">Back to Patients List</a>
+</p>
+{% endblock %}
