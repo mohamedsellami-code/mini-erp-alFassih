@@ -262,4 +262,15 @@ a.list-group-item:focus {
 .form-group .invalid-feedback span { /* Ensure multiple errors are displayed block-wise */
     display: block;
 }
+
+/* Consistent spacing for Font Awesome icons followed by text */
+.fas, .far, .fal, .fab { /* Target all Font Awesome styles */
+    margin-right: 5px;
+}
+
+/* Specific adjustment for buttons to ensure vertical alignment and spacing */
+.btn .fas, .btn .far, .btn .fal, .btn .fab {
+    /* margin-right is already handled by the rule above */
+    /* vertical-align: middle; */ /* Might be needed if icons look off-center vertically, but Bootstrap usually handles this */
+}
 ```

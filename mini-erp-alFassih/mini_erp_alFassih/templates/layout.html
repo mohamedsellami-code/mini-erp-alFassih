@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ title }} - My Flask Application{% endblock %}</title> {# Made title block more specific #}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUA6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content/site.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='content/custom.css') }}" /> {# Added custom.css #}
     <script src="{{ url_for('static', filename='scripts/modernizr-2.6.2.js') }}"></script>
@@ -23,19 +24,19 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('list_patients') }}">Patients</a></li>
-                    <li><a href="{{ url_for('list_sessions') }}">Sessions</a></li>
+                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="{{ url_for('list_patients') }}"><i class="fas fa-users"></i> Patients</a></li>
+                    <li><a href="{{ url_for('list_sessions') }}"><i class="fas fa-calendar-alt"></i> Sessions</a></li>
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> Admin <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
-                            <li><a href="{{ url_for('list_therapists') }}">Manage Therapists</a></li>
+                            <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="{{ url_for('list_therapists') }}"><i class="fas fa-user-md"></i> Manage Therapists</a></li>
                             {# Add other admin links here later #}
                         </ul>
                     </li>
-                    <li><a href="{{ url_for('about') }}">About</a></li>
-                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
                 </ul>
             </div>
         </div>

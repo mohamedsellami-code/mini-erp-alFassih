@@ -58,10 +58,10 @@
 
     <hr>
     <h4>Quick Links:</h4>
-    <ul>
-        <li><a href="{{ url_for('create_patient') }}">Add New Patient</a></li>
-        <li><a href="{{ url_for('create_therapist') }}">Add New Therapist</a></li>
-        <li><a href="{{ url_for('create_session') }}">Schedule New Session</a></li>
+    <ul class="list-unstyled"> {# Using list-unstyled for cleaner look, or could use nav pills #}
+        <li><a href="{{ url_for('create_patient') }}" class="btn btn-default"><i class="fas fa-user-plus"></i> Add New Patient</a></li>
+        <li style="margin-top: 5px;"><a href="{{ url_for('create_therapist') }}" class="btn btn-default"><i class="fas fa-user-plus"></i> Add New Therapist</a></li>
+        <li style="margin-top: 5px;"><a href="{{ url_for('create_session') }}" class="btn btn-default"><i class="fas fa-calendar-plus"></i> Schedule New Session</a></li>
     </ul>
 
     <hr>

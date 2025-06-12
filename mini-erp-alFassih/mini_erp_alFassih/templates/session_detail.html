@@ -35,12 +35,12 @@
 
 <hr>
 
-<a href="{{ url_for('edit_session', session_id=session.id) }}" class="btn btn-warning">Edit Session</a>
+<a href="{{ url_for('edit_session', session_id=session.id) }}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit Session</a>
 {% if session.status == 'Scheduled' %}
 <form action="{{ url_for('cancel_session', session_id=session.id) }}" method="POST" style="display:inline; margin-left: 10px;">
-    <input type="submit" value="Cancel Session" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this session?');">
+    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this session?');"><i class="fas fa-times-circle"></i> Cancel Session</button>
 </form>
 {% endif %}
-<a href="{{ url_for('list_sessions') }}" class="btn btn-info" style="margin-left: 10px;">Back to All Sessions</a>
+<a href="{{ url_for('list_sessions') }}" class="btn btn-info" style="margin-left: 10px;"><i class="fas fa-list-ul"></i> Back to All Sessions</a>
 
 {% endblock %}
