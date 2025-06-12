@@ -35,6 +35,7 @@
                         <ul class="dropdown-menu">
                             <li><a href="{{ url_for('admin.admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                             <li><a href="{{ url_for('admin.list_therapists') }}"><i class="fas fa-user-md"></i> Manage Therapists</a></li>
+                            <li><a href="{{ url_for('admin.list_users') }}"><i class="fas fa-users-cog"></i> Manage Users</a></li>
                             {# Add other admin links here later #}
                         </ul>
                     </li>
@@ -43,8 +44,16 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_authenticated %}
-                        <li><a href="#">Logged in as: {{ current_user.email }}</a></li>
-                        <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> {{ current_user.email }} <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('auth.change_password') }}"><i class="fas fa-key"></i> Change Password</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </li>
                     {% else %}
                         <li><a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                     {% endif %}

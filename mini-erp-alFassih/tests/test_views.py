@@ -119,6 +119,62 @@ class TestPatientViews(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Listed Doc", response.data)
 
+    def test_change_password_form_loads(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.get(url_for('auth.change_password'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Change Your Password", response.data)
+
+    def test_change_password_success(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.post(url_for('auth.change_password'), data={
+            'current_password': 'therapass',
+            'new_password': 'newtherapass',
+            'confirm_new_password': 'newtherapass'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Your password has been updated successfully!", response.data)
+        self.assertIn(url_for('main.home'), response.request.path)
+
+        self.logout()
+
+        response_old_pass = self.login(self.therapist_user.email, 'therapass')
+        self.assertIn(b'Invalid email or password', response_old_pass.data)
+
+        response_new_pass = self.login(self.therapist_user.email, 'newtherapass')
+        self.assertIn(b'Logged in successfully!', response_new_pass.data)
+
+    def test_change_password_incorrect_current(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.post(url_for('auth.change_password'), data={
+            'current_password': 'wrongcurrentpass',
+            'new_password': 'newpassword',
+            'confirm_new_password': 'newpassword'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Incorrect current password.", response.data)
+
+    def test_change_password_mismatched_new(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.post(url_for('auth.change_password'), data={
+            'current_password': 'therapass',
+            'new_password': 'newpassword1',
+            'confirm_new_password': 'newpassword2'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"New passwords must match.", response.data)
+
+    def test_change_password_unauthenticated(self):
+        response = self.client.get(url_for('auth.change_password'), follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith(url_for('auth.login', next=url_for('auth.change_password'))))
+
+    def test_404_error_page(self):
+        response = self.client.get('/a-route-that-does-not-exist')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn(b"404 - Page Not Found", response.data)
+        self.assertIn(b"Sorry, the page you are looking for does not exist.", response.data)
+
 class TestAuthViews(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
@@ -180,6 +236,66 @@ class TestAuthViews(unittest.TestCase):
         response = self.client.get(url_for('patients.list_patients'))
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Patients", response.data)
+
+    def test_change_password_form_loads(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.get(url_for('auth.change_password'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Change Your Password", response.data)
+
+    def test_change_password_success(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.post(url_for('auth.change_password'), data={
+            'current_password': 'therapass',
+            'new_password': 'newtherapass',
+            'confirm_new_password': 'newtherapass'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Your password has been updated successfully!", response.data)
+        self.assertIn(url_for('main.home'), response.request.path) # Check redirect to home
+
+        self.logout()
+
+        # Try login with old password
+        response_old_pass = self.login(self.therapist_user.email, 'therapass')
+        self.assertIn(b'Invalid email or password', response_old_pass.data)
+
+        # Try login with new password
+        response_new_pass = self.login(self.therapist_user.email, 'newtherapass')
+        self.assertIn(b'Logged in successfully!', response_new_pass.data)
+
+    def test_change_password_incorrect_current(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.post(url_for('auth.change_password'), data={
+            'current_password': 'wrongcurrentpass',
+            'new_password': 'newpassword',
+            'confirm_new_password': 'newpassword'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200) # Stays on change_password page
+        self.assertIn(b"Incorrect current password.", response.data)
+        self.assertIn(b"Change Your Password", response.data)
+
+    def test_change_password_mismatched_new(self):
+        self.login(self.therapist_user.email, 'therapass')
+        response = self.client.post(url_for('auth.change_password'), data={
+            'current_password': 'therapass',
+            'new_password': 'newpassword1',
+            'confirm_new_password': 'newpassword2' # Mismatch
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200) # Stays on change_password page
+        self.assertIn(b"New passwords must match.", response.data)
+        self.assertIn(b"Change Your Password", response.data)
+
+    def test_change_password_unauthenticated(self):
+        response = self.client.get(url_for('auth.change_password'), follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith(url_for('auth.login', next=url_for('auth.change_password'))))
+
+    def test_404_error_page(self):
+        response = self.client.get('/a-route-that-does-not-exist')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn(b"404 - Page Not Found", response.data)
+        self.assertIn(b"Sorry, the page you are looking for does not exist.", response.data)
 
 class TestTherapistAdminViews(unittest.TestCase):
     def setUp(self):
@@ -386,6 +502,102 @@ class TestAdminDashboardView(unittest.TestCase):
         self.assertIn(url_for('main.home'), response.location)
         response_redirect = self.client.get(response.location)
         self.assertIn(b"You do not have permission", response_redirect.data)
+
+
+class TestAdminUserManagementViews(unittest.TestCase):
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app_context = app.app_context()
+        self.app_context.push()
+        self.client = app.test_client()
+        db.create_all()
+
+        self.admin_user = models.User(email='admin_usermgmt@example.com', role='admin', first_name='AdminMgr')
+        self.admin_user.set_password('adminpass')
+
+        self.target_user = models.User(email='therapist_target@example.com', role='therapist', first_name='TargetThera', is_active=True)
+        self.target_user.set_password('therapass')
+
+        db.session.add_all([self.admin_user, self.target_user])
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    def _login(self, email, password):
+        return self.client.post(url_for('auth.login'), data={'email': email, 'password': password}, follow_redirects=True)
+
+    def test_list_users_as_admin(self):
+        self._login(self.admin_user.email, 'adminpass')
+        response = self.client.get(url_for('admin.list_users'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Manage Users", response.data)
+        self.assertIn(self.admin_user.email.encode(), response.data)
+        self.assertIn(self.target_user.email.encode(), response.data)
+
+    def test_list_users_as_non_admin(self):
+        self._login(self.target_user.email, 'therapass') # Login as therapist
+        response = self.client.get(url_for('admin.list_users'), follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(url_for('main.home'), response.location)
+
+        response_redirect = self.client.get(response.location)
+        self.assertIn(b"You do not have permission", response_redirect.data)
+
+    def test_list_users_unauthenticated(self):
+        response = self.client.get(url_for('admin.list_users'), follow_redirects=False)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith(url_for('auth.login', next=url_for('admin.list_users'))))
+
+    def test_deactivate_activate_user(self):
+        self._login(self.admin_user.email, 'adminpass')
+
+        # Deactivate
+        response_deactivate = self.client.get(url_for('admin.deactivate_user', user_id=self.target_user.id), follow_redirects=True)
+        self.assertEqual(response_deactivate.status_code, 200)
+        self.assertIn(b"has been deactivated", response_deactivate.data)
+        target_user_after_deactivate = db.session.get(models.User, self.target_user.id)
+        self.assertFalse(target_user_after_deactivate.is_active)
+
+        # Activate
+        response_activate = self.client.get(url_for('admin.activate_user', user_id=self.target_user.id), follow_redirects=True)
+        self.assertEqual(response_activate.status_code, 200)
+        self.assertIn(b"has been activated", response_activate.data)
+        target_user_after_activate = db.session.get(models.User, self.target_user.id)
+        self.assertTrue(target_user_after_activate.is_active)
+
+    def test_admin_cannot_deactivate_self(self):
+        self._login(self.admin_user.email, 'adminpass')
+        response = self.client.get(url_for('admin.deactivate_user', user_id=self.admin_user.id), follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"You cannot deactivate your own account.", response.data)
+        admin_user_after_attempt = db.session.get(models.User, self.admin_user.id)
+        self.assertTrue(admin_user_after_attempt.is_active)
+
+    def test_non_admin_cannot_activate_deactivate(self):
+        other_user = models.User(email='other@example.com', role='therapist', is_active=True)
+        other_user.set_password('otherpass')
+        db.session.add(other_user)
+        db.session.commit()
+
+        self._login(self.target_user.email, 'therapass') # Login as non-admin therapist
+
+        response_deact = self.client.get(url_for('admin.deactivate_user', user_id=other_user.id), follow_redirects=False)
+        self.assertEqual(response_deact.status_code, 302)
+        self.assertIn(url_for('main.home'), response_deact.location)
+
+        other_user.is_active = False # Manually set for activate test part
+        db.session.commit()
+        response_act = self.client.get(url_for('admin.activate_user', user_id=other_user.id), follow_redirects=False)
+        self.assertEqual(response_act.status_code, 302)
+        self.assertIn(url_for('main.home'), response_act.location)
+
+        other_user_after_attempts = db.session.get(models.User, other_user.id)
+        self.assertFalse(other_user_after_attempts.is_active)
 
 if __name__ == '__main__':
     unittest.main()

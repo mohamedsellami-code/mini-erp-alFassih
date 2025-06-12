@@ -1,0 +1,70 @@
+# Environment variables
+.env
+*.env
+env.prod
+env.dev
+
+# Instance folder (for SQLite DB, uploads, etc.)
+instance/
+instance.*/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Compiled Python files (less common now but good to have)
+*.pyo
+
+# Editor backup files
+*~
+*.swp
+*.swo
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal # SQLite journal file
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+VENV/
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Test artifacts
+.coverage
+.pytest_cache/
+htmlcov/
+nosetests.xml
+coverage.xml
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+pip-wheel-metadata/
+
+# IPython Notebook checkpoints
+.ipynb_checkpoints
+
+# Flask session files (if using filesystem session type)
+flask_session/
+```

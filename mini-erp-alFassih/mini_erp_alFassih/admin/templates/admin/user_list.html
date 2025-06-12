@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block title %}Manage Users - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Manage Users</h2>
+    {# Optional: Link to a future "Create User" page for admins, if manual user creation by admin is desired outside of Therapist creation. #}
+    {# <p><a href="{{ url_for('admin.create_user') }}" class="btn btn-primary"><i class="fas fa-user-plus"></i> Create New User Manually</a></p> #}
+
+    {% if users %}
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user_account in users %}
+            <tr>
+                <td>{{ user_account.id }}</td>
+                <td><a href="mailto:{{ user_account.email }}">{{ user_account.email }}</a></td>
+                <td>{{ user_account.first_name or 'N/A' }}</td>
+                <td>{{ user_account.last_name or 'N/A' }}</td>
+                <td>
+                    <span class="badge
+                        {% if user_account.role == 'admin' %}badge-primary{% elif user_account.role == 'therapist' %}badge-info{% else %}badge-default{% endif %}">
+                        {{ user_account.role | capitalize }}
+                    </span>
+                </td>
+                <td>
+                    {% if user_account.is_active %}
+                        <span class="badge badge-success">Active</span>
+                    {% else %}
+                        <span class="badge badge-danger">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if user_account.id != current_user.id %} {# Admins cannot deactivate/activate themselves via these buttons #}
+                        {% if user_account.is_active %}
+                            <a href="{{ url_for('admin.deactivate_user', user_id=user_account.id) }}"
+                               class="btn btn-xs btn-warning"
+                               onclick="return confirm('Are you sure you want to deactivate this user?');">
+                               <i class="fas fa-user-slash"></i> Deactivate
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('admin.activate_user', user_id=user_account.id) }}"
+                               class="btn btn-xs btn-success"
+                               onclick="return confirm('Are you sure you want to activate this user?');">
+                               <i class="fas fa-user-check"></i> Activate
+                            </a>
+                        {% endif %}
+                    {% else %}
+                         <span class="text-muted">(Current User)</span>
+                    {% endif %}
+                    {# Optional: Link to edit user details/roles page (future) #}
+                    {# <a href="{{ url_for('admin.edit_user_roles', user_id=user_account.id) }}" class="btn btn-xs btn-info" style="margin-left:5px;"><i class="fas fa-user-edit"></i> Edit Roles</a> #}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No users found.</p>
+    {% endif %}
+</div>
+{% endblock %}

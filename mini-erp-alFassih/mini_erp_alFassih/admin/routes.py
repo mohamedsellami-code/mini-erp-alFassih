@@ -133,3 +133,37 @@ def delete_therapist(therapist_id):
     db.session.delete(therapist)
     db.session.commit()
     return jsonify(success=True, message='Therapist deleted successfully.', therapist_id=therapist_id), 200
+
+# User Management (Admin)
+@admin_bp.route('/users')
+@login_required
+@admin_required
+def list_users():
+    users = User.query.order_by(User.email).all()
+    return render_template('admin/user_list.html', users=users, title='Manage Users', year=datetime.now().year)
+
+@admin_bp.route('/users/<int:user_id>/activate', methods=['GET']) # Changed to GET for simplicity now
+@login_required
+@admin_required
+def activate_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id: # Prevent admin from activating themselves if already active (though UI prevents this)
+        flash('You cannot change the status of your own account this way.', 'danger')
+    else:
+        user.is_active = True
+        db.session.commit()
+        flash(f'User {user.email} has been activated.', 'success')
+    return redirect(url_for('admin.list_users'))
+
+@admin_bp.route('/users/<int:user_id>/deactivate', methods=['GET']) # Changed to GET for simplicity now
+@login_required
+@admin_required
+def deactivate_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id: # Prevent admin from deactivating themselves
+        flash('You cannot deactivate your own account.', 'danger')
+    else:
+        user.is_active = False
+        db.session.commit()
+        flash(f'User {user.email} has been deactivated.', 'warning')
+    return redirect(url_for('admin.list_users'))

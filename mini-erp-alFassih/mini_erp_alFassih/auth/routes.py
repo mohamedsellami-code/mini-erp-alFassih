@@ -1,11 +1,11 @@
 from flask import render_template, redirect, url_for, request, flash
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required # Added login_required
 from datetime import datetime
 
 from . import auth_bp
-from .forms import LoginForm
-from ..models import User # Use .. to go up one level to import models
-from .. import db # If db session operations are needed directly, though usually via models
+from .forms import LoginForm, ChangePasswordForm # Added ChangePasswordForm
+from ..models import User
+from .. import db
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -30,3 +30,18 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login')) # Redirect to auth.login after logout
+
+@auth_bp.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if current_user.check_password(form.current_password.data):
+            current_user.set_password(form.new_password.data)
+            # db.session.add(current_user) # Not strictly needed if current_user is already part of session
+            db.session.commit()
+            flash('Your password has been updated successfully!', 'success')
+            return redirect(url_for('main.home')) # Or a profile page e.g. url_for('auth.profile')
+        else:
+            flash('Incorrect current password.', 'danger')
+    return render_template('auth/change_password.html', title='Change Password', form=form, year=datetime.now().year)
