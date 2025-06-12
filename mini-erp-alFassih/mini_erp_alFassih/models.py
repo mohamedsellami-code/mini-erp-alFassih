@@ -4,7 +4,7 @@ from datetime import datetime
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
-    last_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False, index=True)
     date_of_birth = db.Column(db.Date, nullable=True)
     contact_info = db.Column(db.Text, nullable=True)
     anamnesis = db.Column(db.Text, nullable=True)
@@ -18,7 +18,7 @@ class Patient(db.Model):
 
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False, index=True)
     document_type = db.Column(db.String(100), nullable=True) # Or False if always required
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
@@ -31,9 +31,8 @@ class Document(db.Model):
 class Therapist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
-    last_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False, index=True)
     specialization = db.Column(db.String(150), nullable=True)
-    # Add a placeholder for sessions relationship, will be defined fully in next step
     sessions = db.relationship('Session', backref='assigned_therapist', lazy='dynamic', cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -41,12 +40,12 @@ class Therapist(db.Model):
 
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    therapist_id = db.Column(db.Integer, db.ForeignKey('therapist.id'), nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False, index=True)
+    therapist_id = db.Column(db.Integer, db.ForeignKey('therapist.id'), nullable=False, index=True)
+    start_time = db.Column(db.DateTime, nullable=False, index=True)
     end_time = db.Column(db.DateTime, nullable=False)
     session_type = db.Column(db.String(150), nullable=True)
-    status = db.Column(db.String(50), default='Scheduled', nullable=False) # E.g., 'Scheduled', 'Completed', 'Cancelled', 'No Show'
+    status = db.Column(db.String(50), default='Scheduled', nullable=False, index=True) # E.g., 'Scheduled', 'Completed', 'Cancelled', 'No Show'
     notes = db.Column(db.Text, nullable=True)
 
     def __repr__(self):

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, DateField, TextAreaField, SubmitField, SelectField
-from wtforms.fields.html5 import DateTimeLocalField # Correct import for DateTimeLocalField
+from wtforms.fields import DateTimeLocalField # Corrected import for WTForms 3.x
 from wtforms.validators import DataRequired, Optional, ValidationError # Added ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 from . import models # Import models to be used by query_factory

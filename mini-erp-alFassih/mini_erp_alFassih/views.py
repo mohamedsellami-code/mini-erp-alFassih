@@ -3,7 +3,7 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime, timedelta # Added timedelta
-from flask import render_template, request, redirect, url_for, current_app, send_from_directory # flash can be added if used
+from flask import render_template, request, redirect, url_for, current_app, send_from_directory, jsonify # Added jsonify
 from mini_erp_alFassih import app, db, models
 from .forms import PatientForm, DocumentForm, SessionForm, TherapistForm
 from .utils import save_document
@@ -200,8 +200,7 @@ def delete_therapist(therapist_id):
     # Cascade delete for sessions is handled by model relationship configuration
     db.session.delete(therapist)
     db.session.commit()
-    # flash('Therapist deleted successfully!', 'success') # Optional
-    return redirect(url_for('list_therapists'))
+    return jsonify(success=True, message='Therapist deleted successfully.', therapist_id=therapist_id), 200
 
 # Session Management Views
 @app.route('/sessions')
@@ -264,5 +263,4 @@ def cancel_session(session_id):
     session = models.Session.query.get_or_404(session_id)
     session.status = 'Cancelled'
     db.session.commit()
-    # flash('Session cancelled.', 'info') # Optional
-    return redirect(request.referrer or url_for('list_sessions'))
+    return jsonify(success=True, message='Session cancelled successfully.', new_status='Cancelled', session_id=session_id), 200

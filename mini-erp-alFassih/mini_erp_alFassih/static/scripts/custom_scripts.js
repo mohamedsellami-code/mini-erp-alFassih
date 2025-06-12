@@ -1,4 +1,25 @@
 $(function () { // Ensure DOM is ready and jQuery is available
+    // Toastr options configuration
+    if (typeof toastr !== 'undefined') { // Check if toastr is loaded
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000", // 5 seconds
+            "extendedTimeOut": "1000", // 1 second
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    }
+
     // CSRF Token Setup for AJAX
     var token = $('meta[name="csrf-token"]').attr('content');
     if (token) { // Check if token exists
@@ -109,10 +130,30 @@ $(function () { // Ensure DOM is ready and jQuery is available
 
                     // Optionally, provide a more user-friendly success message than an alert.
                     // For now, an alert is fine.
-                    if(response && response.message) { // If server sends back a message
-                        alert(response.message);
+                    if (response.success) {
+                        // Use response.session_id from the JSON response for reliability
+                        $('#session-status-text-' + response.session_id)
+                            .text(response.new_status)
+                            .removeClass('badge-scheduled badge-completed badge-no badge-info badge-danger')
+                            .addClass('badge-' + response.new_status.toLowerCase());
+
+                        $button.removeClass('btn-danger').addClass('btn-secondary disabled').prop('disabled', true).html('<i class="fas fa-check-circle"></i> ' + response.new_status);
+
+                        if (toastr && response.message) {
+                            toastr.success(response.message);
+                        } else if (toastr) {
+                            toastr.success('Session action completed.'); // Generic success
+                        } else {
+                            alert(response.message || 'Session action completed.');
+                        }
                     } else {
-                        alert('Session cancelled successfully.');
+                        if (toastr && response.message) {
+                            toastr.error(response.message);
+                        } else if (toastr) {
+                            toastr.error('Failed to update session status.');
+                        } else {
+                            alert(response.message || 'Failed to update session status.');
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
@@ -121,7 +162,11 @@ $(function () { // Ensure DOM is ready and jQuery is available
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
-                    alert(errorMessage);
+                    if (toastr) {
+                        toastr.error(errorMessage);
+                    } else {
+                        alert(errorMessage);
+                    }
                 }
             });
         }
@@ -153,10 +198,27 @@ $(function () { // Ensure DOM is ready and jQuery is available
                         }
                     });
 
-                    if(response && response.message) {
-                        alert(response.message);
+                    if (response.success) {
+                        // Use response.therapist_id from the JSON response
+                        $('#therapist-row-' + response.therapist_id).fadeOut(500, function() {
+                            $(this).remove();
+                            // Optional: Check if table is empty and show "No therapists found"
+                        });
+                        if (toastr && response.message) {
+                            toastr.success(response.message);
+                        } else if (toastr) {
+                            toastr.success('Therapist deleted successfully.');
+                        } else {
+                            alert(response.message || 'Therapist deleted successfully.');
+                        }
                     } else {
-                        alert('Therapist deleted successfully.');
+                        if (toastr && response.message) {
+                            toastr.error(response.message);
+                        } else if (toastr) {
+                            toastr.error('Failed to delete therapist.');
+                        } else {
+                            alert(response.message || 'Failed to delete therapist.');
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
@@ -165,7 +227,11 @@ $(function () { // Ensure DOM is ready and jQuery is available
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;
                     }
-                    alert(errorMessage);
+                    if (toastr) {
+                        toastr.error(errorMessage);
+                    } else {
+                        alert(errorMessage);
+                    }
                 }
             });
         }
