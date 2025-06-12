@@ -10,7 +10,7 @@
 
     <div class="form-group">
         {{ form.title.label(class="form-control-label") }}<br>
-        {{ form.title(class="form-control form-control-lg", size=50) }}<br>
+        {{ form.title(class="form-control form-control-lg", size=50, required="required") }}<br>
         {% if form.title.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in form.title.errors %}<span>{{ error }}</span>{% endfor %}
@@ -40,7 +40,7 @@
 
     <div class="form-group">
         {{ form.file.label(class="form-control-label") }}<br>
-        {{ form.file(class="form-control-file") }}<br>
+        {{ form.file(class="form-control-file", required="required") }}<br>
         {% if form.file.errors %}
             <div class="invalid-feedback d-block">
                 {% for error in form.file.errors %}<span>{{ error }}</span>{% endfor %}

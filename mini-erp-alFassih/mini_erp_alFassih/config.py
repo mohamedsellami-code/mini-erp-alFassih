@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 # Determine project root (one level up from this app package file) to load .env
 # Assuming this config.py is inside the 'mini_erp_alFassih' app package,
 # and the .env file is in the project root 'mini-erp-alFassih/'.
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) # Corrected path
 dotenv_path = os.path.join(project_root, '.env')
 
 if os.path.exists(dotenv_path):
@@ -37,6 +37,15 @@ class ProductionConfig(Config):
         print("WARNING: SECRET_KEY is not set or is using the default weak key in ProductionConfig!")
     if not os.environ.get('DATABASE_URL'):
         print("WARNING: DATABASE_URL is not set in ProductionConfig!")
+
+    # Secure Cookie Settings for Production
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax' # Or 'Strict' if appropriate for your app's needs
+
+    REMEMBER_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SAMESITE = 'Lax' # Or 'Strict'
 
 
 config_by_name = dict(

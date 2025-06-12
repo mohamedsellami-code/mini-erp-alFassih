@@ -74,32 +74,48 @@ def create_app(config_name=None):
     from .errors import errors_bp # Import the errors blueprint
     app.register_blueprint(errors_bp)
 
+    if not app.debug and not app.testing: # Configure logging for production-like environments
+        import logging
+        from logging.handlers import RotatingFileHandler
+        # import os # os is already imported at the top
+
+        # Ensure instance folder exists (it should from earlier UPLOAD_FOLDER setup, but double check)
+        # This was already done earlier in create_app, so it's likely redundant here, but safe.
+        if not os.path.exists(app.instance_path):
+            try:
+                os.makedirs(app.instance_path)
+            except OSError:
+                 # Handle potential race condition or permission issue if necessary
+                pass
+
+
+        # Log to a file in the instance folder
+        file_handler = RotatingFileHandler(
+            os.path.join(app.instance_path, 'alfassih.log'), # Log file path
+            maxBytes=10240,  # Max 10KB per file before rotating
+            backupCount=10   # Keep 10 backup files
+        )
+
+        # Set a specific format for the log messages
+        log_format = logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+        )
+        file_handler.setFormatter(log_format)
+
+        # Set the logging level for the file handler
+        file_handler.setLevel(logging.INFO) # Log INFO level and above (WARNING, ERROR, CRITICAL)
+
+        # Add the file handler to the app's logger
+        app.logger.addHandler(file_handler)
+
+        # Also set the app's logger level (if not set, it might default to WARNING)
+        app.logger.setLevel(logging.INFO)
+
+        app.logger.info('Al-Fasih application startup') # Test log message
+
     return app
 
-# This part is for when __init__.py was directly runnable or imported by runserver.py as 'app'
-# With app factory, runserver.py will call create_app().
-# For simplicity, if runserver.py still expects 'app', we can create a default app here.
-# However, it's better to modify runserver.py to use create_app().
-# For now, let's assume runserver.py will be updated.
-# If not, a default app instance would be:
-# app = create_app(os.getenv('FLASK_CONFIG', 'default'))
-
-# The old direct 'app' instantiation and config will be removed or refactored into create_app.
-# The following lines from the old structure will be effectively replaced by the factory.
-# app = Flask(__name__)
-# UPLOAD_FOLDER = os.path.join(app.instance_path, 'uploads')
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# ... os.makedirs ...
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///alfassih.db'
-# db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
-# from . import models
-# app.register_blueprint(main_bp)
-# ... etc. for other blueprints and login_manager setup ...
-# @login_manager.user_loader ...
-# To make 'app' available if runserver.py still imports it directly:
-# This is a common pattern if you're transitioning to app factory.
-# The FLASK_APP environment variable in .env should point to this file (e.g., mini_erp_alFassih:app)
-# or to runserver.py which then calls create_app.
-# If FLASK_APP points here, Flask CLI needs an 'app' variable or a 'create_app' factory.
-app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+# The global 'app' instance is removed.
+# Flask CLI and WSGI servers should now use the 'create_app' factory.
+# For example, set FLASK_APP=mini_erp_alFassih:create_app() in .env or shell.
+# runserver.py has been updated to call create_app().

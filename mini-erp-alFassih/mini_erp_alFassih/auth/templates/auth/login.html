@@ -23,7 +23,7 @@
 
                 <div class="form-group {% if form.email.errors %}has-error{% endif %}">
                     {{ form.email.label(class="control-label") }}
-                    {{ form.email(class="form-control", placeholder="Enter your email") }}
+                    {{ form.email(class="form-control", placeholder="Enter your email", required="required") }}
                     {% if form.email.errors %}
                         <span class="help-block">
                         {% for error in form.email.errors %}<span>{{ error }}</span><br>{% endfor %}
@@ -33,7 +33,7 @@
 
                 <div class="form-group {% if form.password.errors %}has-error{% endif %}">
                     {{ form.password.label(class="control-label") }}
-                    {{ form.password(class="form-control", placeholder="Enter your password") }}
+                    {{ form.password(class="form-control", placeholder="Enter your password", required="required") }}
                      {% if form.password.errors %}
                         <span class="help-block">
                         {% for error in form.password.errors %}<span>{{ error }}</span><br>{% endfor %}
