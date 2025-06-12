@@ -1,22 +1,19 @@
-"""
-Routes and views for the flask application.
-"""
-
-from datetime import datetime
+# mini-erp-alFassih/mini_erp_alFassih/main/routes.py
 from flask import render_template
-from mini_erp_alFassih import app
+from datetime import datetime
+from . import main_bp # Import the blueprint instance
 
-@app.route('/')
-@app.route('/home')
+@main_bp.route('/')
+@main_bp.route('/home')
 def home():
     """Renders the home page."""
     return render_template(
-        'index.html',
+        'index.html', # These will be found in app/templates/
         title='Home Page',
         year=datetime.now().year,
     )
 
-@app.route('/contact')
+@main_bp.route('/contact')
 def contact():
     """Renders the contact page."""
     return render_template(
@@ -26,7 +23,7 @@ def contact():
         message='Your contact page.'
     )
 
-@app.route('/about')
+@main_bp.route('/about')
 def about():
     """Renders the about page."""
     return render_template(

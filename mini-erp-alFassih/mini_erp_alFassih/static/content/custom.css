@@ -1,0 +1,276 @@
+/* Define CSS variables for the color palette */
+:root {
+    --primary-green: #28a745;
+    --lighter-green: #e6f5e9;
+    --darker-green: #1e7e34;
+    --neutral-light: #f8f9fa;
+    --neutral-dark: #343a40;
+    --subtle-border: #ced4da;
+    --white: #ffffff;
+    --light-text-on-dark: var(--white); /* For text on dark green backgrounds */
+}
+
+/* General Body Styles */
+body {
+    background-color: var(--neutral-light);
+    color: var(--neutral-dark);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Example modern sans-serif font stack */
+    padding-top: 70px; /* Added padding to body because of navbar-fixed-top */
+}
+
+/* Navigation Bar (Bootstrap .navbar-inverse is dark, .navbar-default is light) */
+/* Assuming .navbar-inverse or a similar dark theme is default from layout.html's example */
+/* If it's .navbar-default, these overrides will still apply a green theme */
+.navbar-inverse { /* Or target the specific class used in layout.html if different, e.g. .navbar-custom */
+    background-color: var(--primary-green);
+    border-color: var(--darker-green);
+}
+.navbar-inverse .navbar-brand {
+    color: var(--light-text-on-dark);
+}
+.navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-brand:focus {
+    color: var(--white);
+}
+.navbar-inverse .navbar-nav > li > a {
+    color: var(--light-text-on-dark);
+}
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+    background-color: var(--darker-green);
+    color: var(--white);
+}
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+    background-color: var(--darker-green);
+    color: var(--white);
+}
+.navbar-inverse .navbar-nav > .open > a,
+.navbar-inverse .navbar-nav > .open > a:hover,
+.navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: var(--darker-green);
+    color: var(--white);
+}
+.navbar-inverse .navbar-toggle {
+    border-color: var(--lighter-green);
+}
+.navbar-inverse .navbar-toggle:hover,
+.navbar-inverse .navbar-toggle:focus {
+    background-color: var(--darker-green);
+}
+.navbar-inverse .navbar-toggle .icon-bar {
+    background-color: var(--light-text-on-dark);
+}
+.dropdown-menu {
+    background-color: var(--white); /* Standard dropdown appearance */
+}
+.dropdown-menu > li > a {
+    color: var(--neutral-dark);
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    background-color: var(--primary-green);
+    color: var(--light-text-on-dark) !important; /* Important to override bootstrap */
+}
+
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--darker-green);
+}
+
+/* Links */
+a {
+    color: var(--primary-green);
+}
+a:hover, a:focus {
+    color: var(--darker-green);
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary-green);
+    border-color: var(--darker-green);
+    color: var(--light-text-on-dark) !important; /* Important to override some bootstrap specificity */
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: var(--darker-green);
+    border-color: #155d27; /* Even darker for border on hover */
+    color: var(--light-text-on-dark) !important;
+}
+/* Ensure text color for other buttons if needed, Bootstrap default is usually fine */
+.btn-default {
+    color: var(--neutral-dark);
+    background-color: var(--white);
+    border-color: var(--subtle-border);
+}
+.btn-default:hover,
+.btn-default:focus {
+    color: var(--neutral-dark);
+    background-color: #e6e6e6; /* Slightly darker white */
+    border-color: #adadad;
+}
+
+
+/* Tables (Bootstrap .table class) */
+.table > thead > tr > th {
+    background-color: var(--lighter-green); /* Light green for table headers */
+    color: var(--darker-green);
+    border-bottom: 2px solid var(--primary-green);
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--neutral-light); /* Ensure striped tables are subtle */
+}
+.table-hover > tbody > tr:hover {
+  background-color: #dff0d8; /* A slightly different light green for hover */
+}
+
+/* Panel styling (used in Admin Dashboard) */
+.panel-primary .panel-heading {
+    background-color: var(--primary-green);
+    border-color: var(--darker-green);
+    color: var(--light-text-on-dark);
+}
+.panel-success .panel-heading { /* Example for other panel types if used */
+    background-color: #dff0d8; /* Lighter green for success panel heading */
+    border-color: var(--primary-green);
+    color: var(--darker-green);
+}
+.panel-info .panel-heading { /* Example for other panel types if used */
+    background-color: #d9edf7; /* Default bootstrap info, or a custom blue-green */
+    border-color: #bce8f1;
+    color: #31708f;
+}
+.panel-footer {
+    background-color: var(--neutral-light);
+    border-top: 1px solid var(--subtle-border);
+}
+
+
+/* Optional: Basic styling for flash messages if we add them later */
+.alert { /* General alert padding and margin */
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+.alert-success {
+    background-color: var(--lighter-green);
+    border-color: var(--primary-green);
+    color: var(--darker-green);
+}
+.alert-danger {
+    /* Standard Bootstrap danger or a custom red */
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+.alert-info {
+     /* Standard Bootstrap info or a custom blue/blue-green */
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+/* Badge styling for status fields */
+.badge {
+    display: inline-block;
+    padding: .25em .4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+}
+.badge-scheduled {
+    color: #fff;
+    background-color: #17a2b8; /* Info blue */
+}
+.badge-completed {
+    color: #fff;
+    background-color: var(--primary-green); /* Success green */
+}
+.badge-cancelled {
+    color: #fff;
+    background-color: #6c757d; /* Secondary grey */
+}
+.badge-no { /* For 'No Show' */
+    color: #fff;
+    background-color: #dc3545; /* Danger red */
+}
+
+/* Form control focus glow */
+.form-control:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); /* Green glow */
+}
+
+/* Ensure dropdown menu hover/focus for primary green uses light text */
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    background-color: var(--primary-green);
+    color: var(--light-text-on-dark) !important; /* Important to override bootstrap */
+}
+
+/* Optional List Group Item styling */
+.list-group-item {
+    border-color: var(--subtle-border); /* Ensure borders match theme */
+    /* Keep default background for clean look, or use var(--white) if needed */
+}
+
+.list-group-item:hover,
+.list-group-item:focus { /* Using :focus as well for accessibility if items can be navigated */
+    background-color: var(--lighter-green); /* Subtle hover */
+    color: var(--darker-green); /* Ensure text is readable on hover */
+    /* Ensure contained links also adapt if necessary, though usually they stand out */
+}
+
+/* If list group items themselves are links (e.g. <a class="list-group-item" href="...">) */
+a.list-group-item {
+    color: var(--neutral-dark); /* Default text color for link list group items */
+}
+
+a.list-group-item:hover,
+a.list-group-item:focus {
+    color: var(--darker-green);
+    background-color: var(--lighter-green);
+}
+
+/* For links inside a non-link list-group-item, ensure they follow standard link colors */
+.list-group-item a:not(.btn):not(.list-group-item) {
+    color: var(--primary-green);
+}
+
+.list-group-item a:not(.btn):not(.list-group-item):hover,
+.list-group-item a:not(.btn):not(.list-group-item):focus {
+    color: var(--darker-green);
+}
+
+/* Basic styling for form field errors if .invalid-feedback is used */
+.invalid-feedback {
+    color: #a94442; /* Standard Bootstrap danger color */
+    font-size: 0.875em; /* Slightly smaller */
+    margin-top: .25rem;
+}
+.form-group .invalid-feedback span { /* Ensure multiple errors are displayed block-wise */
+    display: block;
+}
+
+/* Consistent spacing for Font Awesome icons followed by text */
+.fas, .far, .fal, .fab { /* Target all Font Awesome styles */
+    margin-right: 5px;
+}
+
+/* Specific adjustment for buttons to ensure vertical alignment and spacing */
+.btn .fas, .btn .far, .btn .fal, .btn .fab {
+    /* margin-right is already handled by the rule above */
+    /* vertical-align: middle; */ /* Might be needed if icons look off-center vertically, but Bootstrap usually handles this */
+}
+```

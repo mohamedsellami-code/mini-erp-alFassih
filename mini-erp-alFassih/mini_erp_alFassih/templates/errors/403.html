@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Forbidden - {{ super() }}{% endblock %}
+{% block content %}
+<div class="container text-center" style="padding-top: 20px; padding-bottom: 20px;">
+    <div class="jumbotron">
+        <h1><i class="fas fa-ban text-danger"></i> 403 - Forbidden</h1>
+        <p class="lead">Sorry, you do not have permission to access this page.</p>
+        <hr class="my-4">
+        <p>If you believe you should have access, please contact the site administrator.</p>
+        <p><a href="{{ url_for('main.home') }}" class="btn btn-primary btn-lg"><i class="fas fa-home"></i> Go to Homepage</a></p>
+    </div>
+</div>
+{% endblock %}
