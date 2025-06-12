@@ -27,7 +27,9 @@
         <p><strong>Start Time:</strong> {{ session.start_time.strftime('%Y-%m-%d %H:%M') if session.start_time else 'N/A' }}</p>
         <p><strong>End Time:</strong> {{ session.end_time.strftime('%Y-%m-%d %H:%M') if session.end_time else 'N/A' }}</p>
         <p><strong>Session Type:</strong> {{ session.session_type if session.session_type else 'N/A' }}</p>
-        <p><strong>Status:</strong> <span class="badge badge-{{ session.status | lower }}">{{ session.status }}</span></p>
+        <p><strong>Status:</strong>
+            <span id="session-status-text-{{ session.id }}" class="badge badge-{{ session.status|lower }}">{{ session.status }}</span>
+        </p>
         <p><strong>Notes:</strong></p>
         <pre>{{ session.notes if session.notes else 'No notes for this session.' }}</pre>
     </div>
@@ -37,9 +39,12 @@
 
 <a href="{{ url_for('edit_session', session_id=session.id) }}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit Session</a>
 {% if session.status == 'Scheduled' %}
-<form action="{{ url_for('cancel_session', session_id=session.id) }}" method="POST" style="display:inline; margin-left: 10px;">
-    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this session?');"><i class="fas fa-times-circle"></i> Cancel Session</button>
-</form>
+<button type="button" class="btn btn-danger btn-sm btn-cancel-session"
+        data-session-id="{{ session.id }}"
+        data-url="{{ url_for('cancel_session', session_id=session.id) }}"
+        style="margin-left: 10px;">
+    <i class="fas fa-times-circle"></i> Cancel Session
+</button>
 {% endif %}
 <a href="{{ url_for('list_sessions') }}" class="btn btn-info" style="margin-left: 10px;"><i class="fas fa-list-ul"></i> Back to All Sessions</a>
 
