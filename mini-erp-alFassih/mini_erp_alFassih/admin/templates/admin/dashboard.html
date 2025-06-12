@@ -20,7 +20,7 @@
                     <p><strong>New in Last 7 Days:</strong> {{ stats.new_patients_last_7_days }}</p>
                 </div>
                 <div class="panel-footer">
-                    <a href="{{ url_for('list_patients') }}" class="btn btn-default btn-sm">Manage Patients &raquo;</a>
+                    <a href="{{ url_for('patients.list_patients') }}" class="btn btn-default btn-sm">Manage Patients &raquo;</a>
                 </div>
             </div>
         </div>
@@ -35,8 +35,8 @@
                     <p><strong>Sessions Scheduled Today:</strong> {{ stats.sessions_today }}</p>
                 </div>
                 <div class="panel-footer">
-                     <a href="{{ url_for('list_therapists') }}" class="btn btn-default btn-sm">Manage Therapists &raquo;</a>
-                     <a href="{{ url_for('list_sessions') }}" class="btn btn-default btn-sm" style="margin-left: 10px;">Manage Sessions &raquo;</a>
+                     <a href="{{ url_for('admin.list_therapists') }}" class="btn btn-default btn-sm">Manage Therapists &raquo;</a>
+                     <a href="{{ url_for('sessions.list_sessions') }}" class="btn btn-default btn-sm" style="margin-left: 10px;">Manage Sessions &raquo;</a>
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="panel-footer">
                     {# Link to a future document management page or patient list #}
-                    <a href="{{ url_for('list_patients') }}" class="btn btn-default btn-sm">View Patient Documents &raquo;</a>
+                    <a href="{{ url_for('patients.list_patients') }}" class="btn btn-default btn-sm">View Patient Documents &raquo;</a>
                 </div>
             </div>
         </div>
@@ -59,9 +59,9 @@
     <hr>
     <h4>Quick Links:</h4>
     <ul class="list-unstyled"> {# Using list-unstyled for cleaner look, or could use nav pills #}
-        <li><a href="{{ url_for('create_patient') }}" class="btn btn-default"><i class="fas fa-user-plus"></i> Add New Patient</a></li>
-        <li style="margin-top: 5px;"><a href="{{ url_for('create_therapist') }}" class="btn btn-default"><i class="fas fa-user-plus"></i> Add New Therapist</a></li>
-        <li style="margin-top: 5px;"><a href="{{ url_for('create_session') }}" class="btn btn-default"><i class="fas fa-calendar-plus"></i> Schedule New Session</a></li>
+        <li><a href="{{ url_for('patients.create_patient') }}" class="btn btn-default"><i class="fas fa-user-plus"></i> Add New Patient</a></li>
+        <li style="margin-top: 5px;"><a href="{{ url_for('admin.create_therapist') }}" class="btn btn-default"><i class="fas fa-user-plus"></i> Add New Therapist</a></li>
+        <li style="margin-top: 5px;"><a href="{{ url_for('sessions.create_session') }}" class="btn btn-default"><i class="fas fa-calendar-plus"></i> Schedule New Session</a></li>
     </ul>
 
     <hr>
@@ -73,7 +73,7 @@
                 <ul class="list-group">
                     {% for patient in recent_patients %}
                         <li class="list-group-item">
-                            <a href="{{ url_for('view_patient', patient_id=patient.id) }}">{{ patient.first_name }} {{ patient.last_name }}</a>
+                            <a href="{{ url_for('patients.view_patient', patient_id=patient.id) }}">{{ patient.first_name }} {{ patient.last_name }}</a>
                             <span class="text-muted pull-right">- Joined: {{ patient.created_at.strftime('%Y-%m-%d') }}</span>
                         </li>
                     {% endfor %}
@@ -88,7 +88,7 @@
                 <ul class="list-group">
                     {% for session in upcoming_sessions %}
                         <li class="list-group-item">
-                            <a href="{{ url_for('view_session', session_id=session.id) }}">
+                            <a href="{{ url_for('sessions.view_session', session_id=session.id) }}">
                                 {% if session.assigned_patient %}{{ session.assigned_patient.first_name }} {{ session.assigned_patient.last_name }}{% else %}N/A{% endif %}
                                 with {% if session.assigned_therapist %}{{ session.assigned_therapist.first_name }} {{ session.assigned_therapist.last_name }}{% else %}N/A{% endif %}
                             </a>

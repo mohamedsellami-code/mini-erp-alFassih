@@ -4,7 +4,7 @@
 
 {% block content %}
 <h2>{{ title }}</h2>
-<p><a href="{{ url_for('create_therapist') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Therapist</a></p>
+<p><a href="{{ url_for('admin.create_therapist') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add New Therapist</a></p>
 
 {% if therapists %}
     <table class="table table-striped">
@@ -25,10 +25,10 @@
                 <td>{{ therapist.last_name }}</td>
                 <td>{{ therapist.specialization if therapist.specialization else 'N/A' }}</td>
                 <td>
-                    <a href="{{ url_for('edit_therapist', therapist_id=therapist.id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
+                    <a href="{{ url_for('admin.edit_therapist', therapist_id=therapist.id) }}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
                     <button type="button" class="btn btn-sm btn-danger btn-delete-therapist"
                             data-therapist-id="{{ therapist.id }}"
-                            data-url="{{ url_for('delete_therapist', therapist_id=therapist.id) }}"
+                            data-url="{{ url_for('admin.delete_therapist', therapist_id=therapist.id) }}"
                             style="margin-left: 5px;">
                         <i class="fas fa-trash-alt"></i> Delete
                     </button>
@@ -38,6 +38,6 @@
         </tbody>
     </table>
 {% else %}
-    <p>No therapists found. <a href="{{ url_for('create_therapist') }}">Add one now.</a></p>
+    <p>No therapists found. <a href="{{ url_for('admin.create_therapist') }}">Add one now.</a></p>
 {% endif %}
 {% endblock %}

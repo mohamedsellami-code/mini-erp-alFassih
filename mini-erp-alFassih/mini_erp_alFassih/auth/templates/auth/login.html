@@ -7,10 +7,12 @@
     <div class="row">
         <div class="col-md-6 col-md-offset-3"> {# For Bootstrap 3 centering #}
             <h2>{{ title }}</h2>
-            <form method="POST" action="{{ url_for('login') }}">
+            <form method="POST" action="{{ url_for('auth.login') }}"> {# Updated action #}
                 {{ form.hidden_tag() }} {# CSRF token #}
 
                 {# Display flashed messages specific to login form if any, or rely on layout.html #}
+                {# Relying on layout.html for flashed messages is generally cleaner #}
+                {# However, if specific placement for only 'danger' messages is needed here: #}
                 {% with messages = get_flashed_messages(with_categories=true, category_filter=["danger"]) %}
                     {% if messages %}
                         {% for category, message in messages %}

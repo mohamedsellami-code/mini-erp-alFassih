@@ -14,7 +14,7 @@
 <hr>
 <div>
     <h3>Documents</h3>
-    <p><a href="{{ url_for('upload_document', patient_id=patient.id) }}" class="btn btn-default btn-sm"><i class="fas fa-upload"></i> Upload New Document</a></p>
+    <p><a href="{{ url_for('patients.upload_document', patient_id=patient.id) }}" class="btn btn-default btn-sm"><i class="fas fa-upload"></i> Upload New Document</a></p>
     {% if patient.documents %}
         <table class="table table-striped">
             <thead>
@@ -34,8 +34,8 @@
                     <td>{{ doc.uploaded_at.strftime('%Y-%m-%d %H:%M') if doc.uploaded_at else 'N/A' }}</td>
                     <td>{{ doc.filename }}</td>
                     <td>
-                        <a href="{{ url_for('download_document', document_id=doc.id) }}" class="btn btn-xs btn-success"><i class="fas fa-download"></i> Download</a>
-                        {# <a href="{{ url_for('delete_document', document_id=doc.id, patient_id=patient.id) }}" class="btn btn-xs btn-danger" onclick="return confirm('Are you sure you want to delete this document?');"><i class="fas fa-trash-alt"></i> Delete</a> #}
+                        <a href="{{ url_for('patients.download_document', document_id=doc.id) }}" class="btn btn-xs btn-success"><i class="fas fa-download"></i> Download</a>
+                        {# <a href="{{ url_for('patients.delete_document', document_id=doc.id, patient_id=patient.id) }}" class="btn btn-xs btn-danger" onclick="return confirm('Are you sure you want to delete this document?');"><i class="fas fa-trash-alt"></i> Delete</a> #}
                         <!-- Delete functionality to be added later -->
                     </td>
                 </tr>
@@ -75,7 +75,7 @@
                     <td>{{ session.start_time.strftime('%Y-%m-%d %H:%M') if session.start_time else 'N/A' }}</td>
                     <td><span class="badge badge-{{ session.status | lower }}">{{ session.status }}</span></td>
                     <td>
-                        <a href="{{ url_for('view_session', session_id=session.id) }}" class="btn btn-xs btn-info">View Details</a>
+                        <a href="{{ url_for('sessions.view_session', session_id=session.id) }}" class="btn btn-xs btn-info">View Details</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -84,12 +84,12 @@
     {% else %}
         <p>No sessions scheduled for this patient.</p>
     {% endif %}
-    <p><a href="{{ url_for('create_session', patient_id=patient.id) }}" class="btn btn-sm btn-success">Schedule New Session for this Patient</a></p>
+    <p><a href="{{ url_for('sessions.create_session', patient_id=patient.id) }}" class="btn btn-sm btn-success">Schedule New Session for this Patient</a></p>
     {# Consider pre-filling patient_id in the form if create_session view supports it via query param #}
 </div>
 <hr>
 <p>
-    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit Patient</a>
-    <a href="{{ url_for('list_patients') }}" class="btn btn-default" style="margin-left: 10px;">Back to Patients List</a>
+    <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn btn-warning"><i class="fas fa-edit"></i> Edit Patient</a>
+    <a href="{{ url_for('patients.list_patients') }}" class="btn btn-default" style="margin-left: 10px;">Back to Patients List</a>
 </p>
 {% endblock %}

@@ -27,26 +27,26 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Home</a></li>
-                    <li><a href="{{ url_for('list_patients') }}"><i class="fas fa-users"></i> Patients</a></li>
-                    <li><a href="{{ url_for('list_sessions') }}"><i class="fas fa-calendar-alt"></i> Sessions</a></li>
+                    <li><a href="{{ url_for('main.home') }}"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="{{ url_for('patients.list_patients') }}"><i class="fas fa-users"></i> Patients</a></li>
+                    <li><a href="{{ url_for('sessions.list_sessions') }}"><i class="fas fa-calendar-alt"></i> Sessions</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i> Admin <span class="caret"></span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                            <li><a href="{{ url_for('list_therapists') }}"><i class="fas fa-user-md"></i> Manage Therapists</a></li>
+                            <li><a href="{{ url_for('admin.admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a href="{{ url_for('admin.list_therapists') }}"><i class="fas fa-user-md"></i> Manage Therapists</a></li>
                             {# Add other admin links here later #}
                         </ul>
                     </li>
-                    <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li>
-                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <li><a href="{{ url_for('main.about') }}"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="{{ url_for('main.contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_authenticated %}
                         <li><a href="#">Logged in as: {{ current_user.email }}</a></li>
-                        <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                     {% else %}
-                        <li><a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                        <li><a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                     {% endif %}
                 </ul>
             </div>

@@ -29,12 +29,29 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 from . import models
-import mini_erp_alFassih.views # views might define routes, including login_view
+# import mini_erp_alFassih.views # This line is no longer needed as views are in blueprints
+
+# Register Blueprints
+from .main import main_bp # Import the main blueprint
+app.register_blueprint(main_bp)
+
+from .auth import auth_bp # Import the auth blueprint
+app.register_blueprint(auth_bp)
+
+from .admin import admin_bp # Import the admin blueprint
+app.register_blueprint(admin_bp)
+
+from .patients import patients_bp # Import the patients blueprint
+app.register_blueprint(patients_bp, url_prefix='/patients') # Add url_prefix for patients routes
+
+from .sessions import sessions_bp # Import the sessions blueprint
+app.register_blueprint(sessions_bp, url_prefix='/sessions')
+
 
 # Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login' # The name of the login view function (will be created in views.py)
+login_manager.login_view = 'auth.login' # Updated to blueprint name
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info' # For styling flash messages
 
