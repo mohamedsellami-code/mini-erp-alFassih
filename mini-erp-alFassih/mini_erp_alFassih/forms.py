@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, DateField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Optional
 
@@ -9,3 +10,13 @@ class PatientForm(FlaskForm):
     contact_info = TextAreaField('Contact Information', validators=[Optional()])
     anamnesis = TextAreaField('Anamnesis', validators=[Optional()])
     submit = SubmitField('Save Patient')
+
+class DocumentForm(FlaskForm):
+    title = StringField('Document Title', validators=[DataRequired()])
+    document_type = StringField('Document Type (e.g., Bilan, Plan Thérapeutique)', validators=[Optional()])
+    description = TextAreaField('Description', validators=[Optional()])
+    file = FileField('Document File', validators=[
+        FileRequired(),
+        FileAllowed(['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docx', 'txt'], 'Allowed file types: Images, PDF, DOC, TXT')
+    ])
+    submit = SubmitField('Upload Document')

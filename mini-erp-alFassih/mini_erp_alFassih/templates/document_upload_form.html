@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - {{ patient.first_name }} {{ patient.last_name }} - My Flask Application{% endblock %}
+
+{% block content %}
+<h2>{{ title }} for {{ patient.first_name }} {{ patient.last_name }}</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }} {# CSRF token and other hidden fields #}
+
+    <div class="form-group">
+        {{ form.title.label(class="form-control-label") }}<br>
+        {{ form.title(class="form-control form-control-lg", size=50) }}<br>
+        {% if form.title.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.title.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form.document_type.label(class="form-control-label") }}<br>
+        {{ form.document_type(class="form-control form-control-lg", size=50) }}<br>
+        {% if form.document_type.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.document_type.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form.description.label(class="form-control-label") }}<br>
+        {{ form.description(class="form-control form-control-lg", cols=50, rows=4) }}<br>
+        {% if form.description.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.description.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form.file.label(class="form-control-label") }}<br>
+        {{ form.file(class="form-control-file") }}<br>
+        {% if form.file.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.file.errors %}<span>{{ error }}</span>{% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+
+<p><a href="{{ url_for('view_patient', patient_id=patient.id) }}">Back to Patient Details</a></p>
+{% endblock %}

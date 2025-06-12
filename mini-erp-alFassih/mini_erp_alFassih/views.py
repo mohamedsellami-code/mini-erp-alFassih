@@ -3,9 +3,10 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, current_app, send_from_directory
 from mini_erp_alFassih import app, db, models
-from .forms import PatientForm
+from .forms import PatientForm, DocumentForm
+from .utils import save_document
 
 @app.route('/')
 @app.route('/home')
@@ -73,3 +74,35 @@ def edit_patient(patient_id):
         db.session.commit()
         return redirect(url_for('view_patient', patient_id=patient.id))
     return render_template('patient_form.html', form=form, patient=patient, title='Edit Patient', year=datetime.now().year)
+
+@app.route('/patients/<int:patient_id>/documents/upload', methods=['GET', 'POST'])
+def upload_document(patient_id):
+    patient = models.Patient.query.get_or_404(patient_id)
+    form = DocumentForm()
+    if form.validate_on_submit():
+        file_storage = form.file.data
+        saved_filename = save_document(file_storage, patient_id)
+
+        new_document = models.Document(
+            patient_id=patient.id,
+            title=form.title.data,
+            document_type=form.document_type.data,
+            description=form.description.data,
+            filename=saved_filename
+        )
+        db.session.add(new_document)
+        db.session.commit()
+        # flash('Document uploaded successfully!', 'success') # Optional: add flash messaging
+        return redirect(url_for('view_patient', patient_id=patient.id))
+
+    return render_template('document_upload_form.html', title='Upload Document', form=form, patient=patient, year=datetime.now().year)
+
+@app.route('/documents/<int:document_id>/download')
+def download_document(document_id):
+    document = models.Document.query.get_or_404(document_id)
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    return send_from_directory(
+        directory=upload_folder,
+        path=document.filename,
+        as_attachment=True
+    )

@@ -37,5 +37,48 @@ class TestPatientModel(unittest.TestCase):
         self.assertEqual(retrieved_patient.first_name, 'Test')
         self.assertEqual(retrieved_patient.last_name, 'User')
 
+class TestDocumentModel(unittest.TestCase):
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.app_context = app.app_context()
+        self.app_context.push()
+        db.create_all()
+
+        # Create a dummy patient for use in document tests
+        self.patient = models.Patient(first_name='Test', last_name='PatientForDoc')
+        db.session.add(self.patient)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    def test_create_document(self):
+        # Create a Document instance
+        doc = models.Document(
+            patient_id=self.patient.id,
+            title='Test Document',
+            document_type='Test Type',
+            filename='test_document.pdf'
+        )
+        db.session.add(doc)
+        db.session.commit()
+
+        # Assert that the document was created
+        self.assertEqual(models.Document.query.count(), 1)
+
+        # Retrieve the document and check details
+        retrieved_document = models.Document.query.first()
+        self.assertIsNotNone(retrieved_document)
+        self.assertEqual(retrieved_document.title, 'Test Document')
+        self.assertEqual(retrieved_document.patient_id, self.patient.id)
+
+        # Assert relationship
+        self.assertEqual(len(self.patient.documents), 1)
+        self.assertEqual(self.patient.documents[0].title, 'Test Document')
+        self.assertIn(retrieved_document, self.patient.documents)
+
 if __name__ == '__main__':
     unittest.main()
