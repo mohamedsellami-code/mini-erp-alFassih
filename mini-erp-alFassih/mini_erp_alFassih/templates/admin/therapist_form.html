@@ -35,11 +35,60 @@
         {{ form.specialization.label(class="form-control-label") }}
         {{ form.specialization(class="form-control form-control-lg" + (" is-invalid" if form.specialization.errors else ""), size=50) }}
         {% if form.specialization.errors %}
-            <div class="invalid-feedback">
-                {% for error in form.specialization.errors %}<span>{{ error }}</span>{% endfor %}
+            <div class="invalid-feedback d-block"> {# Ensure d-block for BS4+ if not default #}
+                {% for error in form.specialization.errors %}<span>{{ error }}</span><br>{% endfor %}
             </div>
         {% endif %}
     </div>
+
+    {# Fields specific to TherapistForm (creating new therapist + user) #}
+    {% if form_type == 'create' %} {# form_type is passed from the view #}
+        <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+            {{ form.email.label(class="control-label") }}
+            {{ form.email(class="form-control form-control-lg", placeholder="User's login email") }}
+            {% if form.email.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.email.errors %}<span>{{ error }}</span><br>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group {% if form.password.errors %}has-error{% endif %}">
+            {{ form.password.label(class="control-label") }}
+            {{ form.password(class="form-control form-control-lg", placeholder="Set a password for the user") }}
+            {% if form.password.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.password.errors %}<span>{{ error }}</span><br>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        {# Add confirm_password field here if using it in TherapistForm #}
+    {% endif %}
+
+    {# Display User Info if editing and user is linked #}
+    {% if form_type == 'edit' and therapist and therapist.user %}
+        <div class="form-group">
+            <label class="control-label">Linked User Email</label>
+            <p class="form-control-static">{{ therapist.user.email }}</p>
+        </div>
+        <div class="form-group">
+            <label class="control-label">User Account Status</label>
+            <p class="form-control-static">
+                <span class="badge badge-{{ 'success' if therapist.user.is_active else 'danger' }}">
+                    {{ 'Active' if therapist.user.is_active else 'Inactive' }}
+                </span>
+            </p>
+            {# If adding user_is_active to EditTherapistProfileForm: #}
+            {# {{ form.user_is_active.label(class="form-check-label") }} #}
+            {# {{ form.user_is_active(class="form-check-input") }} #}
+        </div>
+    {% elif form_type == 'edit' and not therapist.user %}
+         <div class="form-group">
+            <label class="control-label">Linked User</label>
+            <p class="form-control-static">This therapist profile is not currently linked to a user account.</p>
+            {# Optionally, add a link/button here to "Link to existing User" or "Create and Link User" #}
+        </div>
+    {% endif %}
 
     <div class="form-group">
         {{ form.submit(class="btn btn-primary") }}

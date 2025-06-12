@@ -41,11 +41,31 @@
                     <li><a href="{{ url_for('about') }}"><i class="fas fa-info-circle"></i> About</a></li>
                     <li><a href="{{ url_for('contact') }}"><i class="fas fa-envelope"></i> Contact</a></li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if current_user.is_authenticated %}
+                        <li><a href="#">Logged in as: {{ current_user.email }}</a></li>
+                        <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </div>
 
     <div class="container body-content">
+        {# Flash message display #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category else 'info' }} alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         {% block content %}{% endblock %}
         <hr />
         <footer>

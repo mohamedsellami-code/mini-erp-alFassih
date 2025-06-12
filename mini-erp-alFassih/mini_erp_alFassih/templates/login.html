@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - My Flask Application{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3"> {# For Bootstrap 3 centering #}
+            <h2>{{ title }}</h2>
+            <form method="POST" action="{{ url_for('login') }}">
+                {{ form.hidden_tag() }} {# CSRF token #}
+
+                {# Display flashed messages specific to login form if any, or rely on layout.html #}
+                {% with messages = get_flashed_messages(with_categories=true, category_filter=["danger"]) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                    {{ form.email.label(class="control-label") }}
+                    {{ form.email(class="form-control", placeholder="Enter your email") }}
+                    {% if form.email.errors %}
+                        <span class="help-block">
+                        {% for error in form.email.errors %}<span>{{ error }}</span><br>{% endfor %}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group {% if form.password.errors %}has-error{% endif %}">
+                    {{ form.password.label(class="control-label") }}
+                    {{ form.password(class="form-control", placeholder="Enter your password") }}
+                     {% if form.password.errors %}
+                        <span class="help-block">
+                        {% for error in form.password.errors %}<span>{{ error }}</span><br>{% endfor %}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="form-group"> {# Bootstrap 3 checkbox styling #}
+                    <div class="checkbox">
+                        <label>
+                            {{ form.remember_me() }} {{ form.remember_me.label.text }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary btn-block") }}
+                </div>
+                {# Optional: Add links for password reset or registration here #}
+                {# <p class="text-center"><a href="#">Forgot password?</a></p> #}
+                {# <p class="text-center">Don't have an account? <a href="#">Register here</a></p> #}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

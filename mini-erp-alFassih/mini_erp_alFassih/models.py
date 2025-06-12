@@ -1,5 +1,26 @@
 from . import db
 from datetime import datetime
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+class User(UserMixin, db.Model): # Inherit from UserMixin
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), index=True, unique=True, nullable=False)
+    password_hash = db.Column(db.String(256)) # Increased length for future hash algorithms
+    role = db.Column(db.String(80), default='therapist', nullable=False) # Default role, e.g. 'therapist', 'admin', 'staff'
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    first_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=True)
+    # created_at = db.Column(db.DateTime, default=datetime.utcnow) # Optional: track user creation
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f'<User {self.email} ({self.role})>'
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,10 +51,12 @@ class Document(db.Model):
 
 class Therapist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, unique=True, index=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False, index=True)
     specialization = db.Column(db.String(150), nullable=True)
     sessions = db.relationship('Session', backref='assigned_therapist', lazy='dynamic', cascade="all, delete-orphan")
+    user = db.relationship('User', backref=db.backref('therapist_profile', uselist=False))
 
     def __repr__(self):
         return f'<Therapist {self.first_name} {self.last_name}>'

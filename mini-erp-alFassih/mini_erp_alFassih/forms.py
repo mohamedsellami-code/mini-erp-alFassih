@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, DateField, TextAreaField, SubmitField, SelectField
+from wtforms import StringField, DateField, TextAreaField, SubmitField, SelectField, PasswordField, BooleanField # Added PasswordField, BooleanField
 from wtforms.fields import DateTimeLocalField # Corrected import for WTForms 3.x
-from wtforms.validators import DataRequired, Optional, ValidationError # Added ValidationError
+from wtforms.validators import DataRequired, Optional, ValidationError, Email # Added Email validator
 from wtforms_sqlalchemy.fields import QuerySelectField
 from . import models # Import models to be used by query_factory
 
@@ -10,8 +10,10 @@ from . import models # Import models to be used by query_factory
 def patient_query():
     return models.Patient.query
 
-def therapist_query():
-    return models.Therapist.query
+def therapist_query(): # For SessionForm
+    # Select Therapist profiles whose associated User is active and has 'therapist' role
+    return models.Therapist.query.join(models.User, models.Therapist.user_id == models.User.id)\
+                                      .filter(models.User.is_active == True, models.User.role == 'therapist')
 
 class PatientForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
@@ -67,4 +69,20 @@ class TherapistForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
     specialization = StringField('Specialization', validators=[Optional()])
-    submit = SubmitField('Save Therapist')
+    email = StringField('User Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Set User Password', validators=[DataRequired()])
+    # confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')]) # Optional
+    submit = SubmitField('Save Therapist and Create User')
+
+class EditTherapistProfileForm(FlaskForm):
+    first_name = StringField('Therapist First Name', validators=[DataRequired()])
+    last_name = StringField('Therapist Last Name', validators=[DataRequired()])
+    specialization = StringField('Specialization', validators=[Optional()])
+    # user_is_active = BooleanField("User Account Active", default=True) # Example for future
+    submit = SubmitField('Save Profile Changes')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Login')
