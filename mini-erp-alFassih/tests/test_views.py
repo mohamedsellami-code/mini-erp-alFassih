@@ -332,6 +332,84 @@ class TestSessionViews(unittest.TestCase):
         cancelled_session = models.Session.query.get(session_id)
         self.assertEqual(cancelled_session.status, 'Cancelled')
 
+class TestAdminDashboardView(unittest.TestCase):
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['WTF_CSRF_ENABLED'] = False
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        # Use self.client consistently, as in other test classes
+        self.client = app.test_client()
+        self.app_context = app.app_context()
+        self.app_context.push()
+        db.create_all()
+
+        # Create sample data
+        self.patient = models.Patient(first_name='Dash', last_name='User', created_at=datetime.utcnow())
+        self.therapist = models.Therapist(first_name='Dr. Board', last_name='Test')
+        db.session.add_all([self.patient, self.therapist])
+        db.session.commit() # Commit patient and therapist to get IDs
+
+        # Create a session that is upcoming
+        session_start_time = datetime.utcnow() + timedelta(hours=2)
+        self.session = models.Session(
+            patient_id=self.patient.id,
+            therapist_id=self.therapist.id,
+            start_time=session_start_time,
+            end_time=session_start_time + timedelta(hours=1),
+            status='Scheduled'
+        )
+        # Create a document for total_documents count
+        self.document = models.Document(patient_id=self.patient.id, title="Test Doc", filename="test.pdf")
+
+        db.session.add_all([self.session, self.document])
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+        # Minimal cleanup, UPLOAD_FOLDER not directly used by this test class's views
+        # but good practice if any operation indirectly creates it.
+        upload_folder = app.config.get('UPLOAD_FOLDER')
+        if upload_folder and os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
+
+
+    def test_dashboard_loads_with_data(self):
+        response = self.client.get('/admin/dashboard')
+        self.assertEqual(response.status_code, 200)
+        response_data = response.data.decode()
+
+        self.assertIn("Admin Dashboard", response_data)
+        self.assertIn("Key Statistics", response_data)
+
+        # Check total counts based on setUp data
+        self.assertIn("Total Patients: 1", response_data)
+        self.assertIn("Total Therapists: 1", response_data)
+        self.assertIn("Total Sessions Logged: 1", response_data)
+        self.assertIn("Total Documents: 1", response_data)
+
+        # Check new patients in last 7 days (patient created now is within 7 days)
+        self.assertIn("New in Last 7 Days: 1", response_data)
+
+        # Check sessions today (session created is for future, so should be 0 for today unless test runs near midnight)
+        # More robust test: check if "Sessions Scheduled Today" text is present, value can be 0 or 1.
+        # For this setup, it will be 0 as it's 2 hours in future.
+        self.assertIn("Sessions Scheduled Today: 0", response_data)
+
+        self.assertIn("Recent Activity", response_data)
+        self.assertIn("Recently Added Patients", response_data)
+        self.assertIn("Dash User", response_data) # Patient name
+
+        self.assertIn("Upcoming Sessions", response_data)
+        # Check for part of therapist name and patient name in upcoming sessions
+        self.assertIn("Dash User", response_data)
+        self.assertIn("Dr. Board Test", response_data)
+
+        # Check for quick links
+        self.assertIn("Add New Patient", response_data)
+        self.assertIn("Manage Therapists", response_data)
+
 
 if __name__ == '__main__':
     unittest.main()

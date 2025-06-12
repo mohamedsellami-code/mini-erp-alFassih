@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - My Flask Application{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ title }}</h2>
+    <p>Overview of your application's activity.</p>
+
+    <hr>
+    <h3>Key Statistics</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Patients</h3>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Total Patients:</strong> {{ stats.total_patients }}</p>
+                    <p><strong>New in Last 7 Days:</strong> {{ stats.new_patients_last_7_days }}</p>
+                </div>
+                <div class="panel-footer">
+                    <a href="{{ url_for('list_patients') }}" class="btn btn-default btn-sm">Manage Patients &raquo;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Therapists & Sessions</h3>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Total Therapists:</strong> {{ stats.total_therapists }}</p>
+                    <p><strong>Total Sessions Logged:</strong> {{ stats.total_sessions }}</p>
+                    <p><strong>Sessions Scheduled Today:</strong> {{ stats.sessions_today }}</p>
+                </div>
+                <div class="panel-footer">
+                     <a href="{{ url_for('list_therapists') }}" class="btn btn-default btn-sm">Manage Therapists &raquo;</a>
+                     <a href="{{ url_for('list_sessions') }}" class="btn btn-default btn-sm" style="margin-left: 10px;">Manage Sessions &raquo;</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Documents</h3>
+                </div>
+                <div class="panel-body">
+                    <p><strong>Total Documents:</strong> {{ stats.total_documents }}</p>
+                </div>
+                <div class="panel-footer">
+                    {# Link to a future document management page or patient list #}
+                    <a href="{{ url_for('list_patients') }}" class="btn btn-default btn-sm">View Patient Documents &raquo;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <h4>Quick Links:</h4>
+    <ul>
+        <li><a href="{{ url_for('create_patient') }}">Add New Patient</a></li>
+        <li><a href="{{ url_for('create_therapist') }}">Add New Therapist</a></li>
+        <li><a href="{{ url_for('create_session') }}">Schedule New Session</a></li>
+    </ul>
+
+    <hr>
+    <h3>Recent Activity</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Recently Added Patients (Last 5)</h4>
+            {% if recent_patients %}
+                <ul class="list-group">
+                    {% for patient in recent_patients %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('view_patient', patient_id=patient.id) }}">{{ patient.first_name }} {{ patient.last_name }}</a>
+                            <span class="text-muted pull-right">- Joined: {{ patient.created_at.strftime('%Y-%m-%d') }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No new patients recently.</p>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h4>Upcoming Sessions (Next 5 Scheduled)</h4>
+            {% if upcoming_sessions %}
+                <ul class="list-group">
+                    {% for session in upcoming_sessions %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('view_session', session_id=session.id) }}">
+                                {% if session.assigned_patient %}{{ session.assigned_patient.first_name }} {{ session.assigned_patient.last_name }}{% else %}N/A{% endif %}
+                                with {% if session.assigned_therapist %}{{ session.assigned_therapist.first_name }} {{ session.assigned_therapist.last_name }}{% else %}N/A{% endif %}
+                            </a>
+                            <br>
+                            <small class="text-muted">
+                                {{ session.start_time.strftime('%a, %d %b %Y %H:%M') }} - {{ session.session_type or "General Session" }}
+                                (Status: <span class="badge badge-{{ session.status | lower }}">{{ session.status }}</span>)
+                            </small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No upcoming sessions scheduled.</p>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

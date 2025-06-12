@@ -13,6 +13,9 @@ class Patient(db.Model):
     documents = db.relationship('Document', backref='patient', lazy=True, cascade="all, delete-orphan")
     sessions = db.relationship('Session', backref='assigned_patient', lazy='dynamic', cascade="all, delete-orphan")
 
+    def __repr__(self):
+        return f'<Patient {self.id}: {self.first_name} {self.last_name}>'
+
 class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)

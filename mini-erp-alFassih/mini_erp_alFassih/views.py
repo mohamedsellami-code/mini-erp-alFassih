@@ -2,10 +2,10 @@
 Routes and views for the flask application.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta # Added timedelta
 from flask import render_template, request, redirect, url_for, current_app, send_from_directory # flash can be added if used
 from mini_erp_alFassih import app, db, models
-from .forms import PatientForm, DocumentForm, SessionForm, TherapistForm # Added TherapistForm, SessionForm was from previous step
+from .forms import PatientForm, DocumentForm, SessionForm, TherapistForm
 from .utils import save_document
 
 @app.route('/')
@@ -110,6 +110,55 @@ def download_document(document_id):
         path=document.filename,
         as_attachment=True
     )
+
+# Admin Dashboard
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    total_patients = models.Patient.query.count()
+    total_documents = models.Document.query.count()
+    total_therapists = models.Therapist.query.count()
+    total_sessions = models.Session.query.count()
+
+    # Patients added in the last 7 days
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    new_patients_last_7_days = models.Patient.query.filter(models.Patient.created_at >= seven_days_ago).count()
+
+    # Sessions scheduled for today
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = today_start + timedelta(days=1)
+    sessions_today = models.Session.query.filter(
+        models.Session.start_time >= today_start,
+        models.Session.start_time < today_end,
+        models.Session.status == 'Scheduled'
+    ).count()
+
+    stats = {
+        'total_patients': total_patients,
+        'total_documents': total_documents,
+        'total_therapists': total_therapists,
+        'total_sessions': total_sessions,
+        'new_patients_last_7_days': new_patients_last_7_days,
+        'sessions_today': sessions_today
+    }
+
+    # Recent Patients (last 5)
+    recent_patients = models.Patient.query.order_by(models.Patient.created_at.desc()).limit(5).all()
+
+    # Upcoming Sessions (next 5, status Scheduled)
+    now = datetime.utcnow() # Use now consistently for time comparisons
+    upcoming_sessions = models.Session.query.filter(
+        models.Session.start_time > now,
+        models.Session.status == 'Scheduled'
+    ).options(
+        db.joinedload(models.Session.assigned_patient), # Eager load for template
+        db.joinedload(models.Session.assigned_therapist)
+    ).order_by(models.Session.start_time.asc()).limit(5).all()
+
+    return render_template('admin/dashboard.html', title='Admin Dashboard',
+                           stats=stats,
+                           recent_patients=recent_patients,
+                           upcoming_sessions=upcoming_sessions,
+                           year=datetime.now().year)
 
 # Admin-like section for Therapists
 @app.route('/admin/therapists')

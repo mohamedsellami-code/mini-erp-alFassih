@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, DateField, TextAreaField, SubmitField, SelectField
 from wtforms.fields.html5 import DateTimeLocalField # Correct import for DateTimeLocalField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, ValidationError # Added ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 from . import models # Import models to be used by query_factory
 
@@ -57,6 +57,11 @@ class SessionForm(FlaskForm):
     ], validators=[DataRequired()])
     notes = TextAreaField('Notes', validators=[Optional()])
     submit = SubmitField('Save Session')
+
+    def validate_end_time(self, field):
+        if self.start_time.data and field.data: # Ensure both fields have data
+            if field.data <= self.start_time.data:
+                raise ValidationError('End time must be after start time.')
 
 class TherapistForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
