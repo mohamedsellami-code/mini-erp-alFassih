@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ title }} - My Flask Application{% endblock %}
+
+{% block content %}
+<h2>{{ title }} (ID: {{ session.id }})</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Session Information</h5>
+        <p><strong>Patient:</strong>
+            {% if session.assigned_patient %}
+                <a href="{{ url_for('view_patient', patient_id=session.assigned_patient.id) }}">
+                    {{ session.assigned_patient.first_name }} {{ session.assigned_patient.last_name }}
+                </a>
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+        <p><strong>Therapist:</strong>
+            {% if session.assigned_therapist %}
+                {{ session.assigned_therapist.first_name }} {{ session.assigned_therapist.last_name }}
+                 ({% if session.assigned_therapist.specialization %}{{ session.assigned_therapist.specialization }}{% else %}No specialization{% endif %})
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+        <p><strong>Start Time:</strong> {{ session.start_time.strftime('%Y-%m-%d %H:%M') if session.start_time else 'N/A' }}</p>
+        <p><strong>End Time:</strong> {{ session.end_time.strftime('%Y-%m-%d %H:%M') if session.end_time else 'N/A' }}</p>
+        <p><strong>Session Type:</strong> {{ session.session_type if session.session_type else 'N/A' }}</p>
+        <p><strong>Status:</strong> <span class="badge badge-{{ session.status | lower }}">{{ session.status }}</span></p>
+        <p><strong>Notes:</strong></p>
+        <pre>{{ session.notes if session.notes else 'No notes for this session.' }}</pre>
+    </div>
+</div>
+
+<hr>
+
+<a href="{{ url_for('edit_session', session_id=session.id) }}" class="btn btn-warning">Edit Session</a>
+{% if session.status == 'Scheduled' %}
+<form action="{{ url_for('cancel_session', session_id=session.id) }}" method="POST" style="display:inline; margin-left: 10px;">
+    <input type="submit" value="Cancel Session" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this session?');">
+</form>
+{% endif %}
+<a href="{{ url_for('list_sessions') }}" class="btn btn-info" style="margin-left: 10px;">Back to All Sessions</a>
+
+{% endblock %}

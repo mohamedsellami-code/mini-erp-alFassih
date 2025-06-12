@@ -47,6 +47,47 @@
     {% endif %}
 </div>
 <hr>
+<div>
+    <h3>Scheduled Sessions</h3>
+    {# sessions is now passed as patient_sessions from the view #}
+    {% if patient_sessions %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Therapist</th>
+                    <th>Type</th>
+                    <th>Start Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in patient_sessions %}
+                <tr>
+                    <td>
+                        {% if session.assigned_therapist %}
+                            {{ session.assigned_therapist.first_name }} {{ session.assigned_therapist.last_name }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ session.session_type if session.session_type else 'N/A' }}</td>
+                    <td>{{ session.start_time.strftime('%Y-%m-%d %H:%M') if session.start_time else 'N/A' }}</td>
+                    <td><span class="badge badge-{{ session.status | lower }}">{{ session.status }}</span></td>
+                    <td>
+                        <a href="{{ url_for('view_session', session_id=session.id) }}" class="btn btn-xs btn-info">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No sessions scheduled for this patient.</p>
+    {% endif %}
+    <p><a href="{{ url_for('create_session', patient_id=patient.id) }}" class="btn btn-sm btn-success">Schedule New Session for this Patient</a></p>
+    {# Consider pre-filling patient_id in the form if create_session view supports it via query param #}
+</div>
+<hr>
 <p>
     <a href="{{ url_for('edit_patient', patient_id=patient.id) }}">Edit Patient</a> |
     <a href="{{ url_for('list_patients') }}">Back to Patients List</a>

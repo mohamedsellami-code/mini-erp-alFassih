@@ -3,9 +3,9 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, current_app, send_from_directory
+from flask import render_template, request, redirect, url_for, current_app, send_from_directory # flash can be added if used
 from mini_erp_alFassih import app, db, models
-from .forms import PatientForm, DocumentForm
+from .forms import PatientForm, DocumentForm, SessionForm, TherapistForm # Added TherapistForm, SessionForm was from previous step
 from .utils import save_document
 
 @app.route('/')
@@ -63,7 +63,11 @@ def create_patient():
 @app.route('/patients/<int:patient_id>')
 def view_patient(patient_id):
     patient = models.Patient.query.get_or_404(patient_id)
-    return render_template('patient_detail.html', patient=patient, title='Patient Details', year=datetime.now().year)
+    # Query and sort sessions here to pass to template
+    # This ensures the sorting logic is in the view, not template.
+    # The relationship is lazy='dynamic', so patient.sessions is a query object.
+    patient_sessions = patient.sessions.order_by(models.Session.start_time.desc()).all()
+    return render_template('patient_detail.html', patient=patient, patient_sessions=patient_sessions, title='Patient Details', year=datetime.now().year)
 
 @app.route('/patients/<int:patient_id>/edit', methods=['GET', 'POST'])
 def edit_patient(patient_id):
@@ -106,3 +110,110 @@ def download_document(document_id):
         path=document.filename,
         as_attachment=True
     )
+
+# Admin-like section for Therapists
+@app.route('/admin/therapists')
+def list_therapists():
+    therapists = models.Therapist.query.all()
+    return render_template('admin/therapist_list.html', therapists=therapists, title='Manage Therapists', year=datetime.now().year)
+
+@app.route('/admin/therapists/new', methods=['GET', 'POST'])
+def create_therapist():
+    form = TherapistForm()
+    if form.validate_on_submit():
+        new_therapist = models.Therapist(
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            specialization=form.specialization.data
+        )
+        db.session.add(new_therapist)
+        db.session.commit()
+        # flash('Therapist added successfully!', 'success') # Optional
+        return redirect(url_for('list_therapists'))
+    return render_template('admin/therapist_form.html', form=form, title='Add New Therapist', year=datetime.now().year)
+
+@app.route('/admin/therapists/<int:therapist_id>/edit', methods=['GET', 'POST'])
+def edit_therapist(therapist_id):
+    therapist = models.Therapist.query.get_or_404(therapist_id)
+    form = TherapistForm(obj=therapist) # Pre-populate form
+    if form.validate_on_submit():
+        therapist.first_name = form.first_name.data
+        therapist.last_name = form.last_name.data
+        therapist.specialization = form.specialization.data
+        db.session.commit()
+        # flash('Therapist updated successfully!', 'success') # Optional
+        return redirect(url_for('list_therapists'))
+    return render_template('admin/therapist_form.html', form=form, title='Edit Therapist', therapist=therapist, year=datetime.now().year)
+
+@app.route('/admin/therapists/<int:therapist_id>/delete', methods=['POST'])
+def delete_therapist(therapist_id):
+    therapist = models.Therapist.query.get_or_404(therapist_id)
+    # Cascade delete for sessions is handled by model relationship configuration
+    db.session.delete(therapist)
+    db.session.commit()
+    # flash('Therapist deleted successfully!', 'success') # Optional
+    return redirect(url_for('list_therapists'))
+
+# Session Management Views
+@app.route('/sessions')
+def list_sessions():
+    # Eager load patient and therapist details to avoid N+1 queries in template
+    sessions = models.Session.query.options(
+        db.joinedload(models.Session.assigned_patient),
+        db.joinedload(models.Session.assigned_therapist)
+    ).order_by(models.Session.start_time.desc()).all()
+    return render_template('sessions_list.html', sessions=sessions, title='All Sessions', year=datetime.now().year)
+
+@app.route('/sessions/new', methods=['GET', 'POST'])
+def create_session():
+    form = SessionForm()
+    if form.validate_on_submit():
+        new_session = models.Session(
+            patient_id=form.patient.data.id, # Corrected: Access id from the Patient object
+            therapist_id=form.therapist.data.id, # Corrected: Access id from the Therapist object
+            start_time=form.start_time.data,
+            end_time=form.end_time.data,
+            session_type=form.session_type.data,
+            status=form.status.data,
+            notes=form.notes.data
+        )
+        db.session.add(new_session)
+        db.session.commit()
+        # flash('Session created successfully!', 'success') # Optional
+        return redirect(url_for('list_sessions'))
+    return render_template('session_form.html', form=form, title='Schedule New Session', year=datetime.now().year)
+
+@app.route('/sessions/<int:session_id>')
+def view_session(session_id):
+    session = models.Session.query.options(
+        db.joinedload(models.Session.assigned_patient),
+        db.joinedload(models.Session.assigned_therapist)
+    ).get_or_404(session_id)
+    return render_template('session_detail.html', session=session, title='Session Details', year=datetime.now().year)
+
+@app.route('/sessions/<int:session_id>/edit', methods=['GET', 'POST'])
+def edit_session(session_id):
+    session = models.Session.query.get_or_404(session_id)
+    form = SessionForm(obj=session)
+
+    if form.validate_on_submit():
+        session.patient_id = form.patient.data.id
+        session.therapist_id = form.therapist.data.id
+        session.start_time = form.start_time.data
+        session.end_time = form.end_time.data
+        session.session_type = form.session_type.data
+        session.status = form.status.data
+        session.notes = form.notes.data
+        db.session.commit()
+        # flash('Session updated successfully!', 'success') # Optional
+        return redirect(url_for('view_session', session_id=session.id))
+
+    return render_template('session_form.html', form=form, title='Edit Session', session=session, year=datetime.now().year)
+
+@app.route('/sessions/<int:session_id>/cancel', methods=['POST'])
+def cancel_session(session_id):
+    session = models.Session.query.get_or_404(session_id)
+    session.status = 'Cancelled'
+    db.session.commit()
+    # flash('Session cancelled.', 'info') # Optional
+    return redirect(request.referrer or url_for('list_sessions'))
